@@ -181,4 +181,4 @@ class WC_Product_Attribute_Links
     }
 }
 
-$wc_product_attribute_link = new WC_Product_Attribute_Links();
+$wc_product_attribute_links = new WC_Product_Attribute_Links();
