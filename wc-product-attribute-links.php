@@ -142,18 +142,10 @@ class WC_Product_Attribute_Links
 
         foreach ($attribute_links as $attribute_name => $product_ids)
         {
-            $products = get_posts(array(
-                'post_type'           => 'product',
-                'ignore_sticky_posts' => 1,
-                'no_found_rows'       => 1,
-                'posts_per_page'      => -1,
-                'post__in'            => $product_ids,
-                'post__not_in'        => array($post->id)
-            ));
 
             $current_product_attributes = get_the_terms($post, $attribute_name);
 
-            if (! empty($products) && ! empty($current_product_attributes) && ! is_wp_error($current_product_attributes)) {
+            if (! empty($product_ids) && ! empty($current_product_attributes) && ! is_wp_error($current_product_attributes)) {
                 ?>
                     <table class="wc_product_attribute_links" cellspacing="0">
                         <tbody>
@@ -170,10 +162,10 @@ class WC_Product_Attribute_Links
                                             <?php echo esc_html($current_product_attributes[0]->name); ?>
                                         </option>
 
-                                        <?php foreach ($products as $product) : ?>
-                                            <?php $product_attributes = get_the_terms($product, $attribute_name); ?>
+                                        <?php foreach ($product_ids as $product_id) : ?>
+                                            <?php $product_attributes = get_the_terms($product_id, $attribute_name); ?>
                                             <?php if (! empty($product_attributes) && ! is_wp_error($product_attributes)) : ?>
-                                                <option value="<?php echo esc_attr($product->guid); ?>">
+                                                <option value="<?php echo esc_attr(get_permalink($product_id)); ?>">
                                                     <?php echo esc_html($product_attributes[0]->name); ?>
                                                 </option>
                                             <?php endif; ?>
