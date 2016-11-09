@@ -45,57 +45,55 @@ class WC_Product_Attribute_Links
      * @return void
      */
     public function setup($attribute_taxonomy)
-    {
-        global $post;
+	{
+		global $post;
 
-        ?>
+		$attribute_links = get_post_meta($post->ID, '_product_attribute_links', true);
+		$attribute_taxonomy_name = wc_attribute_taxonomy_name($attribute_taxonomy->attribute_name);
+		$product_ids = array_filter(array_map('absint', (array) $attribute_links[$attribute_taxonomy_name]));
+		$json_ids = array();
 
-            </td>
-        </tr>
+		foreach ($product_ids as $product_id) {
+			$product = wc_get_product($product_id);
+			if (is_object($product)) {
+				$json_ids[$product_id] = wp_kses_post(html_entity_decode($product->get_formatted_name(), ENT_QUOTES, get_bloginfo('charset')));
+			}
+		}
 
-        <tr>
-            <td>
-                <strong>Links</strong><?php echo wc_help_tip('Select product(s) you want to link to for this attribute.'); ?>
-            </td>
-            <td>
-                <div class="options_group show_if_simple">
-                    <input type="hidden"
-                        class="wc-product-search"
-                        name="product_attribute_links[<?php echo wc_attribute_taxonomy_name($attribute_taxonomy->attribute_name); ?>]"
-                        data-placeholder="<?php esc_attr_e('Search for a product&hellip;'); ?>"
-                        data-action="woocommerce_json_search_products"
-                        data-multiple="true"
-                        data-exclude="<?php echo intval($post->ID); ?>"
-                        data-selected="<?php
-                                        $attribute_links = get_post_meta($post->ID, '_product_attribute_links', true);
-                                        $attribute_taxonomy_name = wc_attribute_taxonomy_name($attribute_taxonomy->attribute_name);
-                                        $product_ids = array_filter(array_map('absint', (array) $attribute_links[$attribute_taxonomy_name]));
-                                        $json_ids = array();
+		?>
 
-                                        foreach ($product_ids as $product_id) {
-                                            $product = wc_get_product($product_id);
-                                            if (is_object($product)) {
-                                                $json_ids[$product_id] = wp_kses_post(html_entity_decode($product->get_formatted_name(), ENT_QUOTES, get_bloginfo('charset')));
-                                            }
-                                        }
+			</td>
+		</tr>
 
-                                        echo esc_attr(json_encode($json_ids));
-                                    ?>"
-                        value="<?php echo implode(',', array_keys($json_ids)); ?>"
-                        >
-                </div>
-            </td>
-        </tr>
+		<tr>
+			<td>
+				<strong>Links</strong><?php echo wc_help_tip('Select product(s) you want to link to for this attribute.'); ?>
+			</td>
+			<td>
+				<div class="options_group show_if_simple">
+					<input type="hidden"
+						class="wc-product-search"
+						name="product_attribute_links[<?php echo wc_attribute_taxonomy_name($attribute_taxonomy->attribute_name); ?>]"
+						data-placeholder="<?php esc_attr_e('Search for a product&hellip;'); ?>"
+						data-action="woocommerce_json_search_products"
+						data-multiple="true"
+						data-exclude="<?php echo intval($post->ID); ?>"
+						data-selected="<?php echo esc_attr(json_encode($json_ids)); ?>"
+						value="<?php echo implode(',', array_keys($json_ids)); ?>"
+					>
+				</div>
+			</td>
+		</tr>
 
-        <style>
-            /* Remove rowspan attr to display properly */
-            #product_attributes .wc-metabox table td[rowspan] {
-                display: block;
-            }
-        </style>
-        
-        <?php
-    }
+		<style>
+			/* Remove rowspan attr to display properly */
+			#product_attributes .wc-metabox table td[rowspan] {
+				display: block;
+			}
+		</style>
+		
+		<?php
+	}
 
     /**
      * Save metadata when product updates.
